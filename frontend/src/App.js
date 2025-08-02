@@ -17,6 +17,9 @@ function App() {
   const [notifications, setNotifications] = useState([]);
   const [messages, setMessages] = useState([]);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleSlides, setGoogleSlides] = useState([]);
+  const [googleDocs, setGoogleDocs] = useState([]);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
