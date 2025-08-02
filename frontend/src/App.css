@@ -1,34 +1,276 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Custom Colors - Midnight Blue, Black, Gold Theme */
+:root {
+  /* Midnight Blues */
+  --midnight-50: #f8fafc;
+  --midnight-100: #f1f5f9;
+  --midnight-200: #e2e8f0;
+  --midnight-300: #cbd5e1;
+  --midnight-400: #94a3b8;
+  --midnight-500: #64748b;
+  --midnight-600: #475569;
+  --midnight-700: #334155;
+  --midnight-800: #1e293b;
+  --midnight-900: #0f172a;
+
+  /* Golds */
+  --gold-50: #fffbeb;
+  --gold-100: #fef3c7;
+  --gold-200: #fde68a;
+  --gold-300: #fcd34d;
+  --gold-400: #fbbf24;
+  --gold-500: #f59e0b;
+  --gold-600: #d97706;
+  --gold-700: #b45309;
+  --gold-800: #92400e;
+  --gold-900: #78350f;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Tailwind Custom Classes */
+.bg-midnight-50 { background-color: var(--midnight-50); }
+.bg-midnight-100 { background-color: var(--midnight-100); }
+.bg-midnight-200 { background-color: var(--midnight-200); }
+.bg-midnight-300 { background-color: var(--midnight-300); }
+.bg-midnight-400 { background-color: var(--midnight-400); }
+.bg-midnight-500 { background-color: var(--midnight-500); }
+.bg-midnight-600 { background-color: var(--midnight-600); }
+.bg-midnight-700 { background-color: var(--midnight-700); }
+.bg-midnight-800 { background-color: var(--midnight-800); }
+.bg-midnight-900 { background-color: var(--midnight-900); }
+
+.bg-gold-50 { background-color: var(--gold-50); }
+.bg-gold-100 { background-color: var(--gold-100); }
+.bg-gold-200 { background-color: var(--gold-200); }
+.bg-gold-300 { background-color: var(--gold-300); }
+.bg-gold-400 { background-color: var(--gold-400); }
+.bg-gold-500 { background-color: var(--gold-500); }
+.bg-gold-600 { background-color: var(--gold-600); }
+.bg-gold-700 { background-color: var(--gold-700); }
+.bg-gold-800 { background-color: var(--gold-800); }
+.bg-gold-900 { background-color: var(--gold-900); }
+
+.text-midnight-50 { color: var(--midnight-50); }
+.text-midnight-100 { color: var(--midnight-100); }
+.text-midnight-200 { color: var(--midnight-200); }
+.text-midnight-300 { color: var(--midnight-300); }
+.text-midnight-400 { color: var(--midnight-400); }
+.text-midnight-500 { color: var(--midnight-500); }
+.text-midnight-600 { color: var(--midnight-600); }
+.text-midnight-700 { color: var(--midnight-700); }
+.text-midnight-800 { color: var(--midnight-800); }
+.text-midnight-900 { color: var(--midnight-900); }
+
+.text-gold-50 { color: var(--gold-50); }
+.text-gold-100 { color: var(--gold-100); }
+.text-gold-200 { color: var(--gold-200); }
+.text-gold-300 { color: var(--gold-300); }
+.text-gold-400 { color: var(--gold-400); }
+.text-gold-500 { color: var(--gold-500); }
+.text-gold-600 { color: var(--gold-600); }
+.text-gold-700 { color: var(--gold-700); }
+.text-gold-800 { color: var(--gold-800); }
+.text-gold-900 { color: var(--gold-900); }
+
+.border-midnight-50 { border-color: var(--midnight-50); }
+.border-midnight-100 { border-color: var(--midnight-100); }
+.border-midnight-200 { border-color: var(--midnight-200); }
+.border-midnight-300 { border-color: var(--midnight-300); }
+.border-midnight-400 { border-color: var(--midnight-400); }
+.border-midnight-500 { border-color: var(--midnight-500); }
+.border-midnight-600 { border-color: var(--midnight-600); }
+.border-midnight-700 { border-color: var(--midnight-700); }
+.border-midnight-800 { border-color: var(--midnight-800); }
+.border-midnight-900 { border-color: var(--midnight-900); }
+
+.border-gold-50 { border-color: var(--gold-50); }
+.border-gold-100 { border-color: var(--gold-100); }
+.border-gold-200 { border-color: var(--gold-200); }
+.border-gold-300 { border-color: var(--gold-300); }
+.border-gold-400 { border-color: var(--gold-400); }
+.border-gold-500 { border-color: var(--gold-500); }
+.border-gold-600 { border-color: var(--gold-600); }
+.border-gold-700 { border-color: var(--gold-700); }
+.border-gold-800 { border-color: var(--gold-800); }
+.border-gold-900 { border-color: var(--gold-900); }
+
+/* Hover states */
+.hover\:bg-midnight-800:hover { background-color: var(--midnight-800); }
+.hover\:bg-gold-700:hover { background-color: var(--gold-700); }
+.hover\:text-gold-400:hover { color: var(--gold-400); }
+.hover\:border-gold-400\/50:hover { border-color: rgba(251, 191, 36, 0.5); }
+
+/* Glass morphism effects */
+.backdrop-blur-lg {
+  backdrop-filter: blur(16px);
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
 }
 
-.App-link {
-    color: #61dafb;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+::-webkit-scrollbar-track {
+  background: var(--midnight-900);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold-600);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-700);
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slideInLeft {
+  animation: slideInFromLeft 0.8s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInFromRight 0.8s ease-out;
+}
+
+/* Custom focus states */
+.focus\:ring-gold-400:focus {
+  --tw-ring-color: var(--gold-400);
+}
+
+.focus\:border-gold-400:focus {
+  border-color: var(--gold-400);
+}
+
+/* Interactive elements */
+.interactive-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.interactive-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(251, 191, 36, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+.interactive-card:hover::before {
+  left: 100%;
+}
+
+/* Responsive design helpers */
+@media (max-width: 768px) {
+  .mobile-hide {
+    display: none;
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, var(--midnight-800) 25%, var(--midnight-700) 37%, var(--midnight-800) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Modern shadow system */
+.shadow-gold {
+  box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.15);
+}
+
+.shadow-midnight {
+  box-shadow: 0 4px 14px 0 rgba(15, 23, 42, 0.5);
+}
+
+/* Text selection */
+::selection {
+  background-color: var(--gold-400);
+  color: var(--midnight-900);
+}
+
+/* Form input enhancements */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold-400);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+}
+
+/* Button hover effects */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Notification pulse effect */
+.notification-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
