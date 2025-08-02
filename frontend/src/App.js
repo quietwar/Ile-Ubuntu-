@@ -206,7 +206,7 @@ function App() {
               onClick={handleLogin}
               className="w-full bg-gold-600 hover:bg-gold-700 text-black font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105"
             >
-              <Google className="mr-2 h-5 w-5" />
+              <LogIn className="mr-2 h-5 w-5" />
               Sign in with Google
             </Button>
           </div>
