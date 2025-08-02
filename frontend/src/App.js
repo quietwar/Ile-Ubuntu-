@@ -6,7 +6,7 @@ import { Textarea } from './components/ui/textarea';
 import { Badge } from './components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './components/ui/dialog';
-import { Bell, MessageSquare, BookOpen, Users, PlusCircle, Google, Presentation, FileText, Video, Mic, Send } from 'lucide-react';
+import { Bell, MessageSquare, BookOpen, Users, PlusCircle, LogIn, Presentation, FileText, Video, Mic, Send } from 'lucide-react';
 import './App.css';
 
 function App() {
