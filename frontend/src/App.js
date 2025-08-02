@@ -347,7 +347,7 @@ function App() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-midnight-800/50 backdrop-blur-lg border border-midnight-700">
+          <TabsList className="grid w-full grid-cols-5 mb-8 bg-midnight-800/50 backdrop-blur-lg border border-midnight-700">
             <TabsTrigger value="dashboard" className="data-[state=active]:bg-gold-600 data-[state=active]:text-black">
               Dashboard
             </TabsTrigger>
@@ -356,6 +356,9 @@ function App() {
             </TabsTrigger>
             <TabsTrigger value="lessons" className="data-[state=active]:bg-gold-600 data-[state=active]:text-black">
               Lessons
+            </TabsTrigger>
+            <TabsTrigger value="google" className="data-[state=active]:bg-gold-600 data-[state=active]:text-black">
+              Google Import
             </TabsTrigger>
             <TabsTrigger value="messages" className="data-[state=active]:bg-gold-600 data-[state=active]:text-black">
               Messages
