@@ -63,6 +63,9 @@ function App() {
       if (lessonsRes.ok) setLessons(await lessonsRes.json());
       if (notificationsRes.ok) setNotifications(await notificationsRes.json());
       if (messagesRes.ok) setMessages(await messagesRes.json());
+      
+      // Try to load Google data (will fail silently if not connected)
+      loadGoogleData();
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     }
