@@ -163,25 +163,88 @@ function App() {
     }
   };
 
-  const sendMessage = async (messageData) => {
+  const connectGoogle = async () => {
     const sessionId = getCookie('session_id');
     try {
-      const response = await fetch(`${BACKEND_URL}/api/messages`, {
+      const response = await fetch(`${BACKEND_URL}/api/google/auth-url`, {
+        headers: { 'X-Session-ID': sessionId }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        window.open(data.auth_url, '_blank', 'width=500,height=600');
+      }
+    } catch (error) {
+      console.error('Failed to get Google auth URL:', error);
+    }
+  };
+
+  const loadGoogleData = async () => {
+    const sessionId = getCookie('session_id');
+    try {
+      const headers = { 'X-Session-ID': sessionId };
+      
+      const [slidesRes, docsRes] = await Promise.all([
+        fetch(`${BACKEND_URL}/api/google/slides`, { headers }),
+        fetch(`${BACKEND_URL}/api/google/docs`, { headers })
+      ]);
+
+      if (slidesRes.ok) {
+        const slidesData = await slidesRes.json();
+        setGoogleSlides(slidesData.presentations);
+        setGoogleConnected(true);
+      }
+      
+      if (docsRes.ok) {
+        const docsData = await docsRes.json();
+        setGoogleDocs(docsData.documents);
+      }
+    } catch (error) {
+      console.error('Failed to load Google data:', error);
+    }
+  };
+
+  const importSlides = async (slidesId, lessonId = null) => {
+    const sessionId = getCookie('session_id');
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/google/import-slides`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Session-ID': sessionId
         },
-        body: JSON.stringify(messageData)
+        body: JSON.stringify({ slides_id: slidesId, lesson_id: lessonId })
       });
 
       if (response.ok) {
-        const newMessage = await response.json();
-        setMessages([newMessage, ...messages]);
-        return newMessage;
+        const result = await response.json();
+        alert('Slides imported successfully!');
+        return result;
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error('Failed to import slides:', error);
+    }
+  };
+
+  const importDocs = async (docsId, lessonId = null) => {
+    const sessionId = getCookie('session_id');
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/google/import-docs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId
+        },
+        body: JSON.stringify({ docs_id: docsId, lesson_id: lessonId })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert('Document imported successfully!');
+        return result;
+      }
+    } catch (error) {
+      console.error('Failed to import document:', error);
     }
   };
 
