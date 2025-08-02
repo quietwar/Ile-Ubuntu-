@@ -9,6 +9,11 @@ import uuid
 import requests
 from datetime import datetime, timedelta
 import json
+from google.auth.transport.requests import Request as GoogleRequest
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 # Initialize FastAPI app
 app = FastAPI(title="LessonHub API", version="1.0.0")
@@ -35,10 +40,33 @@ lessons_collection = db.lessons
 slides_collection = db.slides
 messages_collection = db.messages
 notifications_collection = db.notifications
+google_tokens_collection = db.google_tokens
 
 # Google OAuth credentials
-GOOGLE_CLIENT_ID = "613974911032-ffmhap5o4pbnasca0f5cpsd17oplvdssps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
+GOOGLE_SCOPES = [
+    'https://www.googleapis.com/auth/presentations',
+    'https://www.googleapis.com/auth/documents',
+    'https://www.googleapis.com/auth/drive.readonly'
+]
+
+# Google OAuth flow configuration
+def create_google_flow():
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": ["http://localhost:3000/auth/google/callback"]
+            }
+        },
+        scopes=GOOGLE_SCOPES
+    )
+    flow.redirect_uri = "http://localhost:3000/auth/google/callback"
+    return flow
 
 # Pydantic models
 class User(BaseModel):
