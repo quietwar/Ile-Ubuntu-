@@ -428,6 +428,102 @@ function App() {
             </div>
           </TabsContent>
 
+          {/* Google Import Tab */}
+          <TabsContent value="google" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-white">Google Import</h2>
+              {!googleConnected && (
+                <Button onClick={connectGoogle} className="bg-gold-600 hover:bg-gold-700 text-black">
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Connect Google Account
+                </Button>
+              )}
+            </div>
+            
+            {googleConnected ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Google Slides */}
+                <Card className="bg-midnight-800/50 backdrop-blur-lg border-midnight-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center">
+                      <Presentation className="mr-2 h-5 w-5 text-gold-400" />
+                      Google Slides
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Import your presentations into lessons
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button onClick={loadGoogleData} className="mb-4 bg-midnight-700 hover:bg-midnight-600 text-white">
+                      Refresh Lists
+                    </Button>
+                    {googleSlides.map(slide => (
+                      <div key={slide.id} className="flex items-center justify-between p-3 rounded-lg bg-black/30 hover:bg-black/50 transition-colors">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-white">{slide.name}</h4>
+                          <p className="text-sm text-gray-400">
+                            Modified: {new Date(slide.modifiedTime).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button 
+                          onClick={() => importSlides(slide.id)}
+                          className="bg-gold-600 hover:bg-gold-700 text-black text-sm"
+                        >
+                          Import
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Google Docs */}
+                <Card className="bg-midnight-800/50 backdrop-blur-lg border-midnight-700">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center">
+                      <FileText className="mr-2 h-5 w-5 text-gold-400" />
+                      Google Docs
+                    </CardTitle>
+                    <CardDescription className="text-gray-400">
+                      Import your documents as lesson plans
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {googleDocs.map(doc => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 rounded-lg bg-black/30 hover:bg-black/50 transition-colors">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-white">{doc.name}</h4>
+                          <p className="text-sm text-gray-400">
+                            Modified: {new Date(doc.modifiedTime).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Button 
+                          onClick={() => importDocs(doc.id)}
+                          className="bg-gold-600 hover:bg-gold-700 text-black text-sm"
+                        >
+                          Import
+                        </Button>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            ) : (
+              <Card className="bg-midnight-800/50 backdrop-blur-lg border-midnight-700">
+                <CardContent className="p-8 text-center">
+                  <Presentation className="mx-auto h-16 w-16 text-gold-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-white mb-2">Connect Your Google Account</h3>
+                  <p className="text-gray-400 mb-6">
+                    Connect your Google account to import slides and documents directly into your lessons.
+                  </p>
+                  <Button onClick={connectGoogle} className="bg-gold-600 hover:bg-gold-700 text-black">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Connect Google Account
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
           {/* Messages Tab */}
           <TabsContent value="messages" className="space-y-6">
             <div className="flex justify-between items-center">
