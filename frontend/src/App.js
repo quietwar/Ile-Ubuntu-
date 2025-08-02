@@ -248,6 +248,28 @@ function App() {
     }
   };
 
+  const sendMessage = async (messageData) => {
+    const sessionId = getCookie('session_id');
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Session-ID': sessionId
+        },
+        body: JSON.stringify(messageData)
+      });
+
+      if (response.ok) {
+        const newMessage = await response.json();
+        setMessages([newMessage, ...messages]);
+        return newMessage;
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
+  };
+
   useEffect(() => {
     handleAuthCallback();
   }, []);
