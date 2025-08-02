@@ -323,17 +323,297 @@ async def get_lessons(class_id: Optional[str] = None, current_user: dict = Depen
     return lessons
 
 # Google integration endpoints
+@app.get("/api/google/auth-url")
+async def get_google_auth_url(current_user: dict = Depends(get_current_user)):
+    """Get Google OAuth authorization URL"""
+    try:
+        flow = create_google_flow()
+        auth_url, _ = flow.authorization_url(prompt='consent')
+        
+        return {"auth_url": auth_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create auth URL: {str(e)}")
+
+@app.post("/api/google/callback")
+async def google_oauth_callback(request: Request, current_user: dict = Depends(get_current_user)):
+    """Handle Google OAuth callback"""
+    try:
+        data = await request.json()
+        authorization_code = data.get("code")
+        
+        if not authorization_code:
+            raise HTTPException(status_code=400, detail="Authorization code required")
+        
+        flow = create_google_flow()
+        flow.fetch_token(code=authorization_code)
+        
+        credentials = flow.credentials
+        
+        # Store Google credentials
+        token_data = {
+            "user_id": current_user["id"],
+            "access_token": credentials.token,
+            "refresh_token": credentials.refresh_token,
+            "token_uri": credentials.token_uri,
+            "client_id": credentials.client_id,
+            "client_secret": credentials.client_secret,
+            "scopes": credentials.scopes,
+            "created_at": datetime.utcnow(),
+            "expires_at": credentials.expiry
+        }
+        
+        # Update or insert Google token
+        google_tokens_collection.replace_one(
+            {"user_id": current_user["id"]},
+            token_data,
+            upsert=True
+        )
+        
+        return {"success": True, "message": "Google account connected successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"OAuth callback failed: {str(e)}")
+
+@app.get("/api/google/slides")
+async def list_google_slides(current_user: dict = Depends(get_current_user)):
+    """List user's Google Slides presentations"""
+    try:
+        # Get user's Google credentials
+        token_data = google_tokens_collection.find_one({"user_id": current_user["id"]})
+        if not token_data:
+            raise HTTPException(status_code=401, detail="Google account not connected")
+        
+        # Create credentials object
+        credentials = Credentials(
+            token=token_data["access_token"],
+            refresh_token=token_data["refresh_token"],
+            token_uri=token_data["token_uri"],
+            client_id=token_data["client_id"],
+            client_secret=token_data["client_secret"],
+            scopes=token_data["scopes"]
+        )
+        
+        # Refresh credentials if needed
+        if credentials.expired:
+            credentials.refresh(GoogleRequest())
+            # Update stored credentials
+            google_tokens_collection.update_one(
+                {"user_id": current_user["id"]},
+                {"$set": {
+                    "access_token": credentials.token,
+                    "expires_at": credentials.expiry
+                }}
+            )
+        
+        # Build Drive service to list presentations
+        drive_service = build('drive', 'v3', credentials=credentials)
+        
+        # Search for Google Slides presentations
+        results = drive_service.files().list(
+            q="mimeType='application/vnd.google-apps.presentation'",
+            pageSize=50,
+            fields="nextPageToken, files(id, name, createdTime, modifiedTime, thumbnailLink)"
+        ).execute()
+        
+        presentations = results.get('files', [])
+        
+        return {"presentations": presentations}
+        
+    except HttpError as error:
+        raise HTTPException(status_code=400, detail=f"Google API error: {error}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list slides: {str(e)}")
+
+@app.get("/api/google/docs")
+async def list_google_docs(current_user: dict = Depends(get_current_user)):
+    """List user's Google Docs documents"""
+    try:
+        # Get user's Google credentials
+        token_data = google_tokens_collection.find_one({"user_id": current_user["id"]})
+        if not token_data:
+            raise HTTPException(status_code=401, detail="Google account not connected")
+        
+        # Create credentials object
+        credentials = Credentials(
+            token=token_data["access_token"],
+            refresh_token=token_data["refresh_token"],
+            token_uri=token_data["token_uri"],
+            client_id=token_data["client_id"],
+            client_secret=token_data["client_secret"],
+            scopes=token_data["scopes"]
+        )
+        
+        # Refresh credentials if needed
+        if credentials.expired:
+            credentials.refresh(GoogleRequest())
+            # Update stored credentials
+            google_tokens_collection.update_one(
+                {"user_id": current_user["id"]},
+                {"$set": {
+                    "access_token": credentials.token,
+                    "expires_at": credentials.expiry
+                }}
+            )
+        
+        # Build Drive service to list documents
+        drive_service = build('drive', 'v3', credentials=credentials)
+        
+        # Search for Google Docs documents
+        results = drive_service.files().list(
+            q="mimeType='application/vnd.google-apps.document'",
+            pageSize=50,
+            fields="nextPageToken, files(id, name, createdTime, modifiedTime, thumbnailLink)"
+        ).execute()
+        
+        documents = results.get('files', [])
+        
+        return {"documents": documents}
+        
+    except HttpError as error:
+        raise HTTPException(status_code=400, detail=f"Google API error: {error}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to list docs: {str(e)}")
+
 @app.post("/api/google/import-slides")
 async def import_google_slides(data: dict, current_user: dict = Depends(get_current_user)):
-    # This will be implemented with Google Slides API
-    # For now, return a placeholder
-    return {"message": "Google Slides import will be implemented", "slides_id": data.get("slides_id")}
+    """Import Google Slides presentation"""
+    try:
+        slides_id = data.get("slides_id")
+        lesson_id = data.get("lesson_id")
+        
+        if not slides_id:
+            raise HTTPException(status_code=400, detail="Slides ID required")
+        
+        # Get user's Google credentials
+        token_data = google_tokens_collection.find_one({"user_id": current_user["id"]})
+        if not token_data:
+            raise HTTPException(status_code=401, detail="Google account not connected")
+        
+        # Create credentials object
+        credentials = Credentials(
+            token=token_data["access_token"],
+            refresh_token=token_data["refresh_token"],
+            token_uri=token_data["token_uri"],
+            client_id=token_data["client_id"],
+            client_secret=token_data["client_secret"],
+            scopes=token_data["scopes"]
+        )
+        
+        # Build Slides service
+        slides_service = build('slides', 'v1', credentials=credentials)
+        
+        # Get presentation details
+        presentation = slides_service.presentations().get(presentationId=slides_id).execute()
+        
+        # Import slides data
+        imported_slides = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "google_slides_id": slides_id,
+            "lesson_id": lesson_id,
+            "title": presentation.get('title', 'Untitled Presentation'),
+            "slides_data": presentation,
+            "imported_at": datetime.utcnow()
+        }
+        
+        slides_collection.insert_one(imported_slides)
+        
+        # Update lesson if lesson_id provided
+        if lesson_id:
+            lessons_collection.update_one(
+                {"id": lesson_id, "teacher_id": current_user["id"]},
+                {"$set": {"google_slides_id": slides_id}}
+            )
+        
+        imported_slides.pop("_id", None)
+        return imported_slides
+        
+    except HttpError as error:
+        raise HTTPException(status_code=400, detail=f"Google API error: {error}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to import slides: {str(e)}")
 
 @app.post("/api/google/import-docs")
 async def import_google_docs(data: dict, current_user: dict = Depends(get_current_user)):
-    # This will be implemented with Google Docs API
-    # For now, return a placeholder
-    return {"message": "Google Docs import will be implemented", "docs_id": data.get("docs_id")}
+    """Import Google Docs document"""
+    try:
+        docs_id = data.get("docs_id")
+        lesson_id = data.get("lesson_id")
+        
+        if not docs_id:
+            raise HTTPException(status_code=400, detail="Docs ID required")
+        
+        # Get user's Google credentials
+        token_data = google_tokens_collection.find_one({"user_id": current_user["id"]})
+        if not token_data:
+            raise HTTPException(status_code=401, detail="Google account not connected")
+        
+        # Create credentials object
+        credentials = Credentials(
+            token=token_data["access_token"],
+            refresh_token=token_data["refresh_token"],
+            token_uri=token_data["token_uri"],
+            client_id=token_data["client_id"],
+            client_secret=token_data["client_secret"],
+            scopes=token_data["scopes"]
+        )
+        
+        # Build Docs service
+        docs_service = build('docs', 'v1', credentials=credentials)
+        
+        # Get document details
+        document = docs_service.documents().get(documentId=docs_id).execute()
+        
+        # Update lesson if lesson_id provided
+        if lesson_id:
+            lessons_collection.update_one(
+                {"id": lesson_id, "teacher_id": current_user["id"]},
+                {"$set": {"google_docs_id": docs_id}}
+            )
+        
+        return {
+            "success": True,
+            "docs_id": docs_id,
+            "title": document.get('title', 'Untitled Document'),
+            "message": "Google Docs imported successfully"
+        }
+        
+    except HttpError as error:
+        raise HTTPException(status_code=400, detail=f"Google API error: {error}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to import docs: {str(e)}")
+
+@app.get("/api/google/slides/{slides_id}")
+async def get_slides_content(slides_id: str, current_user: dict = Depends(get_current_user)):
+    """Get Google Slides content"""
+    try:
+        # Get user's Google credentials
+        token_data = google_tokens_collection.find_one({"user_id": current_user["id"]})
+        if not token_data:
+            raise HTTPException(status_code=401, detail="Google account not connected")
+        
+        # Create credentials object
+        credentials = Credentials(
+            token=token_data["access_token"],
+            refresh_token=token_data["refresh_token"],
+            token_uri=token_data["token_uri"],
+            client_id=token_data["client_id"],
+            client_secret=token_data["client_secret"],
+            scopes=token_data["scopes"]
+        )
+        
+        # Build Slides service
+        slides_service = build('slides', 'v1', credentials=credentials)
+        
+        # Get presentation content
+        presentation = slides_service.presentations().get(presentationId=slides_id).execute()
+        
+        return {"presentation": presentation}
+        
+    except HttpError as error:
+        raise HTTPException(status_code=400, detail=f"Google API error: {error}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get slides content: {str(e)}")
 
 # Messaging endpoints
 @app.post("/api/messages")
